@@ -49,6 +49,9 @@ function Container() {
             <h1 className=""></h1>
             <select className='border px-2 -mt-3'>
               <option value="">Clicks</option>
+              <option value="">Cost </option>
+              <option value="">Conversions</option>
+              <option value="">Revenue</option>
             </select>
           </div>
           <hr className="mb-4 border-t border-gray-300" />
