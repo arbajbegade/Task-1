@@ -1,11 +1,9 @@
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
 
-const Chart = () => {
+const Chart = ({ data }) => {
   const chartData = {
-    series: [40, 35, 25],
+    series: data || [348,692,105], // Default to [0] if data is not available
     options: {
       chart: {
         width: 380,
@@ -33,16 +31,16 @@ const Chart = () => {
         height: 230,
         align: 'left',
       },
-      labels: ['Male &nbsp; &nbsp; ', 'Female', 'Others '],
+      labels: ['Male', 'Female', 'Unknown'], // You can modify labels based on your data
     },
   };
 
   return (
-      <div className="chart-wrap mx-auto"> 
-        <div id="chart">
-          <ReactApexChart options={chartData.options} series={chartData.series} type="donut" width={380} />
-        </div>
+    <div className="chart-wrap mx-auto">
+      <div id="chart">
+        <ReactApexChart options={chartData.options} series={chartData.series} type="donut" width={380} />
       </div>
+    </div>
   );
 };
 

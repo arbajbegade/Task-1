@@ -1,84 +1,125 @@
-import React from 'react';
+import React, { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TableSortLabel,
+} from '@mui/material';
 
-function createData(
-  name,
-  clicks,
-  cost,
-  conversions,
-  revenue
-) {
-  return { name, clicks, cost, conversions, revenue };
-}
+const BasicTable = () => {
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const rows = [
+    { name: 'Cosmetics', clicks: 712, cost: 4272, conversions: 8, revenue: 16568 },
+    { name: 'Serums', clicks: 3961, cost: 27331, conversions: 115, revenue: 362526 },
+    { name: 'Facewash', clicks: 9462, cost: 76831, conversions: 123, revenue: 266800 },
+    { name: 'Shampoos', clicks: 439, cost: 2151, conversions: 5, revenue: 11029 },
+    { name: 'Conditioners', clicks: 1680, cost: 3864, conversions: 49, revenue: 175245 },
+    { name: 'Facewash 2', clicks: 2000, cost: 29370, conversions: 189, revenue: 623106 },
+  ];
 
-const rows = [
-  createData('Cosmetics', 712, 'USD 4,272', 8, 'USD 16,568'),
-  createData('Serums', 3961, 'USD 27,331', 115, 'USD 362,526'),
-  createData('Facewash', 9462, 'USD 76,831', 123, 'USD 266,800'),
-  createData('Shampoos', 439, 'USD 2,151', 5, 'USD 11,029'),
-  createData('Conditioners', 1680, 'USD 3,864', 49, 'USD 175,245'),
-  createData('Facewash 2', 2000, 'USD 29,370', 189, 'USD 623,106'),
-];
+  const handleSort = (property) => {
+    const newSortOrder = sortBy === property && sortOrder === 'asc' ? 'desc' : 'asc';
+    setSortBy(property);
+    setSortOrder(newSortOrder);
+  };
 
-function calculateTotals(data) {
-  const totals = data.reduce(
-    (acc, row) => {
-      acc.clicks += row.clicks;
-      acc.cost += parseFloat(row.cost.replace('USD ', '').replace(',', ''));
-      acc.conversions += row.conversions;
-      acc.revenue += parseFloat(row.revenue.replace('USD ', '').replace(',', ''));
-      return acc;
-    },
-    { clicks: 0, cost: 0, conversions: 0, revenue: 0 }
-  );
+  const sortedRows = rows.sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
 
-  return createData(
-    'Total',
-    totals.clicks,
-    `USD ${totals.cost.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`,
-    totals.conversions,
-    `USD ${totals.revenue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`
-  );
-}
+    if (sortOrder === 'asc') {
+      return aValue < bValue ? -1 : 1;
+    } else {
+      return aValue > bValue ? -1 : 1;
+    }
+  });
 
-export default function BasicTable() {
-  const totalRow = calculateTotals(rows);
+  const totalRow = {
+    name: 'Total',
+    clicks: rows.reduce((sum, row) => sum + row.clicks, 0),
+    cost: rows.reduce((sum, row) => sum + row.cost, 0),
+    conversions: rows.reduce((sum, row) => sum + row.conversions, 0),
+    revenue: rows.reduce((sum, row) => sum + row.revenue, 0),
+  };
 
   return (
-    <div className="max-w-full overflow-x-auto">
-    <table className="min-w-full bg-white border ">
-      <thead>
-        <tr className="font-semibold text-xs sm:text-base">
-          <th className="py-2 px-2 sm:px-4 border-b text-left">Campaigns</th>
-          <th className="py-2 px-2 sm:px-4 border-b text-right">Clicks</th>
-          <th className="py-2 px-2 sm:px-4 border-b text-right">Cost</th>
-          <th className="py-2 px-2 sm:px-4 border-b text-right">Conversions</th>
-          <th className="py-2 px-2 sm:px-4 border-b text-right">Revenue</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row,index) => (
-          <tr
-          key={row.name}
-          className={`border-b text-[10px] sm:text-sm ${
-            index % 2 === 1 ? 'bg-gray-100' : '' 
-          }`}
-        >
-            <td className="py-2 px-2 sm:px-4">{row.name}</td>
-            <td className="py-2 px-2 sm:px-4 text-right">{row.clicks}</td>
-            <td className="py-2 px-2 sm:px-4 text-right">{row.cost}</td>
-            <td className="py-2 px-2 sm:px-4 text-right">{row.conversions}</td>
-            <td className="py-2 px-2 sm:px-4 text-right">{row.revenue}</td>
-          </tr>
-        ))}
-        <tr className="font-semibold text-[10px] sm:text-sm">
-          <td className="py-2 px-2 sm:px-4">{totalRow.name}</td>
-          <td className="py-2 px-2 sm:px-4 text-right">{totalRow.clicks}</td>
-          <td className="py-2 px-2 sm:px-4 text-right">{totalRow.cost}</td>
-          <td className="py-2 px-2 sm:px-4 text-right">{totalRow.conversions}</td>
-          <td className="py-2 px-2 sm:px-4 text-right">{totalRow.revenue}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>
+              <TableSortLabel
+                active={sortBy === 'name'}
+                direction={sortBy === 'name' ? sortOrder : 'asc'}
+                onClick={() => handleSort('name')}
+              >
+                Campaigns
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="right">
+              <TableSortLabel
+                active={sortBy === 'clicks'}
+                direction={sortBy === 'clicks' ? sortOrder : 'asc'}
+                onClick={() => handleSort('clicks')}
+              >
+                Clicks
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="right">
+              <TableSortLabel
+                active={sortBy === 'cost'}
+                direction={sortBy === 'cost' ? sortOrder : 'asc'}
+                onClick={() => handleSort('cost')}
+              >
+                Cost
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="right">
+              <TableSortLabel
+                active={sortBy === 'conversions'}
+                direction={sortBy === 'conversions' ? sortOrder : 'asc'}
+                onClick={() => handleSort('conversions')}
+              >
+                Conversions
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="right">
+              <TableSortLabel
+                active={sortBy === 'revenue'}
+                direction={sortBy === 'revenue' ? sortOrder : 'asc'}
+                onClick={() => handleSort('revenue')}
+              >
+                Revenue
+              </TableSortLabel>
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {sortedRows.map((row, index) => (
+            <TableRow key={row.name} className={index % 2 === 1 ? 'bg-gray-100' : ''}>
+              <TableCell>{row.name}</TableCell>
+              <TableCell align="right">{row.clicks}</TableCell>
+              <TableCell align="right">USD {row.cost}</TableCell>
+              <TableCell align="right">{row.conversions}</TableCell>
+              <TableCell align="right">USD {row.revenue}</TableCell>
+            </TableRow>
+          ))}
+          <TableRow>
+            <TableCell>{totalRow.name}</TableCell>
+            <TableCell align="right">{totalRow.clicks}</TableCell>
+            <TableCell align="right">USD {totalRow.cost}</TableCell>
+            <TableCell align="right">{totalRow.conversions}</TableCell>
+            <TableCell align="right">USD {totalRow.revenue}</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
-}
+};
+
+export default BasicTable
